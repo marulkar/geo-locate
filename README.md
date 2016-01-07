@@ -1,11 +1,11 @@
 # GeoLocate
 Verizon coding test.
 
-This project will  
+This project will:    
 - Detect users Latitude and Longitude displaying it on Google maps.  
 - Let the user type in an address and display the corresponding Latitude, Longitude and the corresponding map. 
 
-Starting the Application.  
+Starting the project:    
 - Install the packages in the requirements.txt document.  
 - Go inside the folder and excute the command `python manage.py runserver`  
 - This will start the server on the url http://localhost.8000
