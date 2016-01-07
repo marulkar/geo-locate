@@ -1,0 +1,2 @@
+Python==3.5.1
+Django==1.9.1 (pip install django)
