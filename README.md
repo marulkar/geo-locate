@@ -3,7 +3,7 @@ Verizon coding test.
 
 This project will:    
 - Detect user's Latitude and Longitude displaying it on Google maps.  
-- Let the user type in an address and display the corresponding Latitude, Longitude and the corresponding map. 
+- Let the user type in an address and display the corresponding Latitude, Longitude and the Google map. 
 
 Starting the project:    
 - Donwload the Zip file of the repository.
