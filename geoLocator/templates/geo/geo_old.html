@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>GeoLocator</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+	  a.a2 {
+    padding-left: 15%;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js" ></script>
+  </head>
+  <body>
+  
+  
+  <a><label>Address</label><input id="add" type="text"></a> 
+  <a class = "a2"><label>Latitude</label><input id="lat" type="text"></a>
+  <a class = "a2"><label>Longitude</label><input id ="lon"type="text"></a>
+	
+    <div id="map"></div>
+    <script>
+// This example creates a rectangle based on the viewport
+// on any 'zoom-changed' event.
+
+
+	
+	function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } 
+    else {
+       alert("Geolocation is not supported by this browser.");
+    }
+}
+	function showPosition(position) {	
+		initMap(position.coords.latitude,position.coords.longitude);
+	    $("#lat").val(position.coords.latitude);
+		$("#lon").val(position.coords.longitude);		
+	}
+		
+	$("#lat").change(function(){
+			$("#add").val("");
+		initMap(parseFloat($("#lat").val()),parseFloat($("#lon").val()));
+	});
+	$("#lon").change(function(){
+		$("#add").val("");
+		initMap(parseFloat($("#lat").val()),parseFloat($("#lon").val()));
+	});
+	
+	$("#add").change(function(){
+		var add = $(this).val();
+		var geocoder = new google.maps.Geocoder();
+		 var lat = parseFloat(localStorage.getItem('lat'));
+		 var lon = parseFloat(localStorage.getItem('lon'));
+		results = geocodeAddress(geocoder, initMap(lat, lon),add);
+		
+		
+	});
+function geocodeAddress(geocoder, resultsMap,add) {
+  
+    geocoder.geocode({'address': add}, function(results, status) {
+    if (status === google.maps.GeocoderStatus.OK) {
+      resultsMap.setCenter(results[0].geometry.location);
+	  var marker = new google.maps.Marker({
+        map: resultsMap,
+        position: results[0].geometry.location,
+		
+		});
+		
+		
+			$("#lat").val(results[0].geometry.location.lat());
+			$("#lon").val(results[0].geometry.location.lng());
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
+function initMap(lat, lon) {
+	
+  var map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 9,
+    center: {lat: lat, lng:lon},
+    mapTypeId: google.maps.MapTypeId.TERRAIN
+  });
+var marker = new google.maps.Marker({
+    position: map.getCenter(),
+ 
+    map: map
+  });
+  var rectangle = new google.maps.Rectangle();
+
+  map.addListener('zoom_changed', function() {
+
+    // Get the current bounds, which reflect the bounds before the zoom.
+    rectangle.setOptions({
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.7,
+      strokeWeight: 2,
+      fillColor: '#FF0000',
+      fillOpacity: 0,
+      map: map,
+      bounds: map.getBounds()
+    });
+  });
+  google.maps.event.trigger(map, 'resize');
+  localStorage.setItem('lat',lat);
+  localStorage.setItem('lon',lon);
+  return map;
+}
+	
+
+
+
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{api}}&callback=getLocation&signed_in=true" async defer>
+	</script>
+  </body>
+</html>

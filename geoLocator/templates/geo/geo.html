@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GeoLocate</title>
+    <!--standard responsive meta tag-->
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        #map {
+            height: 100%;
+        }
+        
+        .controls {
+            margin-top: 10px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        #pac-input {
+            background-color: #fff;
+            font-family: Roboto;
+            font-size: 15px;
+            font-weight: 300;
+            margin-left: 12px;
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 300px;
+        }
+        
+        #pac-input:focus {
+            border-color: #4d90fe;
+        }
+        
+        .pac-container {
+            font-family: Roboto;
+        }
+        
+        #type-selector {
+            color: #fff;
+            background-color: #4d90fe;
+            padding: 5px 11px 0px 11px;
+        }
+        
+        #type-selector label {
+            font-family: Roboto;
+            font-size: 13px;
+            font-weight: 300;
+        }
+    </style>
+</head>
+
+<body>
+    <input id="pac-input" class="controls" type="text" placeholder="Enter a location">
+
+    <input id="latitude" class="controls" type="text" placeholder="Latitude">
+
+    <input id="longitude" class="controls" type="text" placeholder="Longitude">
+    <div id="map"></div>
+
+    <script>
+        var map;
+        var marker;
+        var infowindow;
+
+        // This callabck function inputs the current position of the device ["position"] to pass it to the map drawing function ["initMap"].  
+		function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(initMap);
+			} else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+        
+        
+		// This function draws the map and marker once and then updates them (instead of redrawing them) 
+		// taking into consideration the updated address object. This method optimizes the code performance. 
+        // The function also adds autocompletion capability to the input address field. 
+		function initMap(position) {
+			var input = document.getElementById('pac-input');
+			var latDom = document.getElementById('latitude');
+            var lngDom = document.getElementById('longitude');
+        	var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var latLng = new google.maps.LatLng(lat, lng);
+			 
+			// Calls the function ["getAdress()"] to output input device address
+			var address = getAdress(latLng);
+			
+			// Update the ["latitude"] and ["longitude"] document elements with
+			// the extracted latitude and longitude co-ordinates from the ["position"] object. 
+			latDom.value = lat;
+            lngDom.value = lng;
+            		
+			// Access ["map"] document element drawing map centered at the extracted latitude and longitude. 
+            // Manage ["input"], ["latitude"] and ["longitude"] containers over the map.
+			map = new google.maps.Map(document.getElementById('map'), {
+                center: {
+                    lat: lat,
+                    lng: lng
+                },
+                zoom: 13
+            });
+			map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(latDom);
+            map.controls[google.maps.ControlPosition.TOP_LEFT].push(lngDom);
+			  
+			// Incorporate the popup window above marker 
+			infowindow = new google.maps.InfoWindow(); 
+            
+            // Draw marker on the designated location
+			marker = new google.maps.Marker({
+                map: map,
+                position: latLng
+            });      
+
+            // Implement the autocomplete lookup function and adjust the autocomplete dropdown menu height. 
+            var autocomplete = new google.maps.places.Autocomplete(input);
+            autocomplete.bindTo('bounds', map);
+			
+			
+			// Add the autocomplete ["place_changed"] listener event 
+			// and implement the function incorporating address change.
+            autocomplete.addListener('place_changed', function() {
+                
+				// Erase marker visibility
+				infowindow.close();
+                marker.setVisible(false);
+
+                var place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    window.alert("Please select one of the addresses from the dropdown menu");
+                    return;
+                }
+				// If the place has a geometry, then present it on a map.
+                if (place.geometry.viewport) {
+                    map.fitBounds(place.geometry.viewport);
+                }                
+                else {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(17); // Why 17? Because it looks good.
+                }
+				
+				 // Rescale the map, customize marker map
+				 // and set its position without re-drawing the map (i.e. in an asynchronous manner). 
+                marker.setIcon( /** @type {google.maps.Icon} */ ({
+                    //url: place.icon,
+                    size: new google.maps.Size(71, 71),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(17, 34),
+                    scaledSize: new google.maps.Size(35, 35)
+                }));               
+                marker.setPosition(place.geometry.location);
+                marker.setVisible(true);
+                
+                // Modify the latitude, longitude values as per the new user request
+				lat = place.geometry.location.lat();
+                lng = place.geometry.location.lng();
+                latDom.value = lat;
+                lngDom.value = lng;
+
+                // Shorten addresses to an appropriate but small title and places it on the infowindow popup.
+				var address = '';
+                if (place.address_components) {
+                    address = [
+                        (place.address_components[0] && place.address_components[0].short_name || ''),
+                        (place.address_components[1] && place.address_components[1].short_name || ''),
+                        (place.address_components[2] && place.address_components[2].short_name || '')
+                    ].join(' ');
+                }
+                infowindow.setContent('<div><strong>' + address + '</strong><br>');
+                infowindow.open(map, marker);
+            });
+        }
+
+        
+		// This function converts the latitude and longitude parameters of the input device to its corresponding address.
+        // Displays it on the ["pac-input"] document element and the infowindow popup.
+		function getAdress(latLng) {
+            var geocoder = new google.maps.Geocoder;
+            var destinationAddress;
+            geocoder.geocode({
+                'location': latLng
+            }, function(results, status) {
+                if (status === google.maps.GeocoderStatus.OK) {
+                    if (results[1]) {
+                        destinationAddress = results[1].formatted_address;
+                        infowindow.setContent('<div><strong>' + destinationAddress + '</strong><br>');
+                        infowindow.open(map, marker);
+                        document.getElementById('pac-input').value = destinationAddress;
+
+                    } else {
+                        locationChosenMarker = createMarker(event.latLng, "name", "<b>Location</b><br>" + event.latLng);
+                    }
+                }
+            });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=getLocation" async defer></script>
+</body>
+
+</html>
