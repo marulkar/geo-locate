@@ -6,9 +6,10 @@ This project will:
 - Let the user type in an address and display the corresponding Latitude, Longitude and the corresponding map. 
 
 Starting the project:    
+- Donwload the Zip file of the repository.
 - Install the packages as listed in the requirements.txt document.  
-- Go inside the folder `geoLocator` and excute the command `python manage.py runserver`  
-- This will start the server on the url http://localhost.8000/geo/
+- `cd` in `geoLocator` and excute the command `python manage.py runserver`  
+- This will start the server on the url http://localhost:8000/geo/
 
 Usage Instructions  
 - `Allow` the browser to share your location with the application to see your current Latitude and Longitude co-ordinates.  
