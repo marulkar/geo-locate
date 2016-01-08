@@ -2,7 +2,7 @@
 Verizon coding test.
 
 This project will:    
-- Detect users Latitude and Longitude displaying it on Google maps.  
+- Detect user's Latitude and Longitude displaying it on Google maps.  
 - Let the user type in an address and display the corresponding Latitude, Longitude and the corresponding map. 
 
 Starting the project:    
@@ -12,4 +12,9 @@ Starting the project:
 
 Usage Instructions  
 - `Allow` the browser to share your location with the application to see your current Latitude and Longitude co-ordinates.  
-- Lookup co-ordinates of any address by typing it in the `Address` tab. 
+- Lookup the co-ordinates (and the corresponding map) of any address by typing it in the `Address` tab. 
+ 
+Utilizes the following APIs:  
+- Google Maps API
+- Google Places API for autocomplete lookups
+  
