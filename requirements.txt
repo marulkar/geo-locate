@@ -1,2 +1,3 @@
 Python==3.5.1
 Django==1.9.1 (pip install django)
+requests==2.8.1 (pip install requests)
