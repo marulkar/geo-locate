@@ -6,7 +6,7 @@ This project will:
 - Let the user type in an address and display the corresponding Latitude, Longitude and the Google map. 
 
 Starting the project:    
-- Donwload the Zip file of the repository.
+- Download the Zip file of the repository.
 - Install the packages as listed in the requirements.txt document.  
 - `cd` in `geoLocator` and excute the command `python manage.py runserver`  
 - This will start the application on the url `http://localhost:8000/geo/`
